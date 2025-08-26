@@ -33,32 +33,83 @@ func (r *UserRepository) GetByName(name string) (*User, error) {
 	return &user, err
 }
 
-// TestRepositoryExample shows how to test repositories
+// TestRepositoryExample shows how to test repositories with different environments
 func TestRepositoryExample(t *testing.T) {
-	db := CreateTestDB(t)
-	err := db.AutoMigrate(&User{})
-	require.NoError(t, err)
+	t.Run("EnvTest with transaction isolation", func(t *testing.T) {
+		db := CreateTestDB(t, EnvTest)
+		err := db.AutoMigrate(&User{})
+		require.NoError(t, err)
 
-	repo := NewUserRepository(db)
+		repo := NewUserRepository(db)
 
-	t.Run("Create and retrieve user", func(t *testing.T) {
-		user := &User{Name: "Alice"}
-		err := repo.Create(user)
+		t.Run("Create and retrieve user", func(t *testing.T) {
+			user := &User{Name: "Alice"}
+			err := repo.Create(user)
+			require.NoError(t, err)
+			assert.NotZero(t, user.ID)
+
+			found, err := repo.GetByID(user.ID)
+			require.NoError(t, err)
+			assert.Equal(t, "Alice", found.Name)
+		})
+
+		t.Run("Find by name", func(t *testing.T) {
+			user := &User{Name: "Bob"}
+			err := repo.Create(user)
+			require.NoError(t, err)
+
+			found, err := repo.GetByName("Bob")
+			require.NoError(t, err)
+			assert.Equal(t, user.ID, found.ID)
+		})
+	})
+
+	t.Run("EnvTest with debug disabled for clean output", func(t *testing.T) {
+		db := CreateTestDB(t, EnvTest, DBDebugOff)
+		err := db.AutoMigrate(&User{})
+		require.NoError(t, err)
+
+		repo := NewUserRepository(db)
+
+		user := &User{Name: "Charlie"}
+		err = repo.Create(user)
 		require.NoError(t, err)
 		assert.NotZero(t, user.ID)
 
-		found, err := repo.GetByID(user.ID)
-		require.NoError(t, err)
-		assert.Equal(t, "Alice", found.Name)
-	})
-
-	t.Run("Find by name", func(t *testing.T) {
-		user := &User{Name: "Bob"}
-		err := repo.Create(user)
-		require.NoError(t, err)
-
-		found, err := repo.GetByName("Bob")
+		found, err := repo.GetByName("Charlie")
 		require.NoError(t, err)
 		assert.Equal(t, user.ID, found.ID)
+	})
+
+	t.Run("EnvDev for integration testing (may skip)", func(t *testing.T) {
+		db := CreateTestDB(t, EnvDev, DBDebugOff)
+		if db == nil {
+			t.Skip("Development database not available")
+			return
+		}
+
+		err := db.AutoMigrate(&User{})
+		require.NoError(t, err)
+
+		repo := NewUserRepository(db)
+
+		user := &User{Name: "Dev User"}
+		err = repo.Create(user)
+		require.NoError(t, err)
+		assert.NotZero(t, user.ID)
+	})
+
+	t.Run("Backwards compatibility", func(t *testing.T) {
+		// Legacy API still works
+		db := CreateTestDBLegacy(t)
+		err := db.AutoMigrate(&User{})
+		require.NoError(t, err)
+
+		repo := NewUserRepository(db)
+
+		user := &User{Name: "Legacy Alice"}
+		err = repo.Create(user)
+		require.NoError(t, err)
+		assert.NotZero(t, user.ID)
 	})
 }
