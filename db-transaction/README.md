@@ -61,6 +61,13 @@ func (r *UserRepository) DebitBalance(ctx context.Context, userID string, amount
 - Using multiple databases (transactions don't span databases)
 - Need distributed transactions (this is local only)
 
+## 🧪 Testing
+
+The pattern includes PostgreSQL-based testing utilities for realistic database testing:
+- `CreateTestDB(t)` - Creates isolated test database with automatic cleanup
+- Works with db-setup pattern (PostgreSQL on localhost:5432)
+- Each test gets its own database instance for complete isolation
+
 ## ⚡ Quick Start
 
 1. **Copy the transaction utilities**:

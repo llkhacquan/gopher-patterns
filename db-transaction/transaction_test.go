@@ -4,18 +4,15 @@ import (
 	"context"
 	"testing"
 
+	dbtesting "db-testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func TestTransactionContext(t *testing.T) {
-	t.Parallel()
-
-	// Setup in-memory database for testing
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
+	// Setup PostgreSQL database for testing
+	db := dbtesting.CreateTestDB(t, dbtesting.EnvTest, dbtesting.DBDebugOff)
 
 	t.Run("GetTx returns nil when no transaction in context", func(t *testing.T) {
 		ctx := context.Background()
@@ -170,12 +167,11 @@ func (s *UserService) TransferBalance(ctx context.Context, fromUserID, toUserID 
 }
 
 func TestRepositoryWithTransaction(t *testing.T) {
-	// Setup database
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
+	// Setup PostgreSQL database
+	db := dbtesting.CreateTestDB(t, dbtesting.EnvTest, dbtesting.DBDebugOff)
 
 	// Auto migrate
-	err = db.AutoMigrate(&User{})
+	err := db.AutoMigrate(&User{})
 	require.NoError(t, err)
 
 	// Setup service and repository

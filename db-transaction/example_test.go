@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	dbtesting "db-testing"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -111,9 +111,8 @@ func (s *BankingService) CreateAccountWithInitialDeposit(ctx context.Context, na
 
 // TestBankingTransactionExample demonstrates the complete banking transaction pattern
 func TestBankingTransactionExample(t *testing.T) {
-	// Setup database
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
+	// Setup PostgreSQL database
+	db := dbtesting.CreateTestDB(t, dbtesting.EnvTest, dbtesting.DBDebugOff)
 
 	// Auto migrate
 	require.NoError(t, db.AutoMigrate(&Account{}))
