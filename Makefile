@@ -1,6 +1,6 @@
 # Gopher Patterns - Central Makefile
 .PHONY: check test example clean help
-.PHONY: test-all test-db-transaction test-db-setup test-sql-migration
+.PHONY: test-all test-db-transaction test-db-setup test-sql-migration test-db-testing
 
 # Main targets (Nova-style)
 check: test-all
@@ -9,7 +9,7 @@ check: test-all
 test: test-all
 
 # Test all implemented patterns (db-setup must run first)
-test-all: test-db-setup test-db-transaction test-sql-migration
+test-all: test-db-setup test-db-transaction test-sql-migration test-db-testing
 
 # Individual pattern tests
 test-db-transaction:
@@ -25,6 +25,9 @@ test-sql-migration:
 	@echo "🚀 Testing SQL Migration pattern..."
 	cd sql-migration && make check
 
+test-db-testing:
+	@echo "🧪 Testing DB Testing pattern..."
+	cd db-testing && make check
 
 # Show help
 help:
@@ -37,3 +40,4 @@ help:
 	@echo "  🔄 db-transaction  - Context-based transaction management"
 	@echo "  🐘 db-setup        - Docker PostgreSQL setup" 
 	@echo "  🚀 sql-migration   - Embedded SQL migrations with Goose"
+	@echo "  🧪 db-testing      - Isolated test database utilities"
