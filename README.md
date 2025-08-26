@@ -16,6 +16,7 @@ Common patterns for Go microservices:
 | Pattern | Purpose | Complexity | Dependencies |
 |---------|---------|------------|--------------|
 | [DB Transaction](./db-transaction/) | Context-based transaction management | Simple | `gorm` |
+| [DB Setup](./db-setup/) | Local PostgreSQL with Docker | Simple | `docker` |
 | [Repository Pattern](./repository-pattern/) | Clean data access layer with testing | Medium | `gorm`, `testify` |
 | [DB Testing](./db-testing/) | Isolated database testing utilities | Simple | `gorm`, `testify` |
 | [gRPC Interceptors](./grpc-interceptors/) | Authentication, logging, metrics middleware | Complex | `grpc`, `zap` |
