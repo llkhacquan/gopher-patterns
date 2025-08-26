@@ -76,20 +76,80 @@ Disables SQL query logging for cleaner test output.
 ### DBNoWrapInTransaction
 Skips automatic transaction wrapping when you need to test transaction logic directly.
 
+### DBWithHook
+Adds post-initialization hooks that run after database creation but before transaction wrapping. Perfect for running migrations, seeding data, or other setup tasks.
+
+```go
+func TestWithMigration(t *testing.T) {
+    migrationHook := func(db *gorm.DB) error {
+        // Run your migration here
+        return migrator.Up(context.Background())
+    }
+    
+    db := CreateTestDB(t, EnvTest, 
+        DBDebugOff,
+        DBWithHook(migrationHook),
+    )
+    
+    // Test against migrated schema
+}
+```
+
 ## Migration Integration
 
-The pattern works seamlessly with sql-migration pattern:
+### Using Hooks (Recommended)
+```go
+func TestWithMigrations(t *testing.T) {
+    // Create migration hook
+    migrationHook := func(db *gorm.DB) error {
+        migrator := NewMigrator(db) // From sql-migration pattern
+        return migrator.Up(context.Background())
+    }
+    
+    // Database automatically has migrated schema
+    db := CreateTestDB(t, EnvTest, 
+        DBDebugOff,
+        DBWithHook(migrationHook),
+    )
+    
+    // Test directly against migrated schema
+    user := User{Name: "Test User"}
+    err := db.Create(&user).Error
+    require.NoError(t, err)
+}
+```
 
+### Manual Migration
 ```go
 func TestWithMigrations(t *testing.T) {
     db := CreateTestDB(t, EnvTest)
     
-    // Run migrations
+    // Run migrations manually
     migrator := NewMigrator(db)
     err := migrator.Up(context.Background())
     require.NoError(t, err)
     
     // Test against migrated schema
+}
+```
+
+### Multiple Hooks
+```go
+func TestWithSetup(t *testing.T) {
+    migrationHook := func(db *gorm.DB) error {
+        return migrator.Up(context.Background())
+    }
+    
+    seedDataHook := func(db *gorm.DB) error {
+        return db.Create(&User{Name: "Seed User"}).Error
+    }
+    
+    db := CreateTestDB(t, EnvTest,
+        DBWithHook(migrationHook), // Run migrations first
+        DBWithHook(seedDataHook),  // Then seed data
+    )
+    
+    // Test with pre-seeded data
 }
 ```
 

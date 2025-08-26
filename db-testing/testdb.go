@@ -80,8 +80,9 @@ func GetConfig(env Env) Config {
 
 // Database options for flexible test configuration
 type dbOptions struct {
-	DebugOff            bool // Turn off SQL query logging
-	NoWrapInTransaction bool // Skip transaction wrapping
+	DebugOff            bool                   // Turn off SQL query logging
+	NoWrapInTransaction bool                   // Skip transaction wrapping
+	PostInitHooks       []func(*gorm.DB) error // Hooks to run after DB initialization (in committed transaction)
 }
 
 // DBOption configures database behavior
@@ -95,6 +96,13 @@ var DBDebugOff DBOption = func(o *dbOptions) {
 // DBNoWrapInTransaction skips automatic transaction wrapping
 var DBNoWrapInTransaction DBOption = func(o *dbOptions) {
 	o.NoWrapInTransaction = true
+}
+
+// DBWithHook adds a post-initialization hook that runs in a committed transaction
+func DBWithHook(hook func(*gorm.DB) error) DBOption {
+	return func(o *dbOptions) {
+		o.PostInitHooks = append(o.PostInitHooks, hook)
+	}
 }
 
 // Connection cache for performance
@@ -206,6 +214,13 @@ func CreateTestDB(t *testing.T, env Env, options ...DBOption) *gorm.DB {
 	default:
 		t.Fatalf("Unknown environment: %v", env)
 		return nil
+	}
+
+	// Run post-initialization hooks in committed transactions
+	for i, hook := range opts.PostInitHooks {
+		t.Logf("Running post-init hook %d", i+1)
+		err := hook(db)
+		require.NoError(t, err, "Post-init hook %d failed", i+1)
 	}
 
 	// Wrap in transaction unless disabled
