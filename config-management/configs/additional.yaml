@@ -1,0 +1,4 @@
+# Additional config loaded via additional_configs pattern
+monitoring:
+  metrics_port: 9090
+  enabled: true

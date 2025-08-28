@@ -1,0 +1,16 @@
+service_name: config_demo
+
+database:
+  host: localhost
+  port: 5432
+
+redis:
+  addresses:
+    - localhost:6379
+
+trading:
+  max_orders_per_user: 1000
+
+# Additional configs pattern
+additional_configs:
+  - ./configs/additional.yaml
