@@ -12,7 +12,7 @@ fmt:
 # Run tests
 test:
 	@echo "🧪 Running tests..."
-	go test -v -timeout 30s ./...
+	go test -timeout 30s ./...
 
 # Check: format + test
 check: fmt test
@@ -21,7 +21,7 @@ check: fmt test
 # Run the example (as test)
 example:
 	@echo "📚 Running SQL migration example..."
-	go test -v -run TestMigrationExample
+	go test -run TestMigrationExample
 
 # Install dependencies
 deps:

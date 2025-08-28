@@ -17,12 +17,12 @@ fmt:
 # Run tests
 test:
 	@echo "🧪 Running tests..."
-	go test -v -timeout 30s ./...
+	go test -timeout 30s ./...
 
 # Run tests with coverage
 test-coverage:
 	@echo "📊 Running tests with coverage..."
-	go test -v -timeout 30s -coverprofile=coverage.out ./...
+	go test -timeout 30s -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
@@ -33,7 +33,7 @@ check: fmt test
 # Run the example (as test)
 example:
 	@echo "🎯 Running PATTERN_NAME example..."
-	go test -v -run TestExamplePattern
+	go test -run TestExamplePattern
 
 # Install dependencies
 deps:

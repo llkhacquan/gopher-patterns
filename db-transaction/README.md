@@ -101,7 +101,7 @@ The pattern includes PostgreSQL-based testing utilities for realistic database t
 
 4. **See the complete example**:
    ```bash
-   go test -v -run TestBankingTransactionExample
+   go test -run TestBankingTransactionExample
    ```
 
 ## 📊 Tradeoffs

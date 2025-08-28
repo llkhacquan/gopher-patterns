@@ -8,7 +8,7 @@ fmt:
 
 test:
 	@echo "Running tests..."
-	go test -v -timeout 30s ./...
+	go test -timeout 30s ./...
 
 gen:
 	@echo "Running GORM code generation..."

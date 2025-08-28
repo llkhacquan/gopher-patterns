@@ -9,14 +9,14 @@ fmt:
 
 test:
 	@echo "🧪 Running tests..."
-	go test -v -timeout 30s ./...
+	go test -timeout 30s ./...
 
 check: fmt test
 	@echo "✅ All checks passed!"
 
 example:
 	@echo "📚 Running DB testing example..."
-	go test -v -run TestRepositoryExample
+	go test -run TestRepositoryExample
 
 deps:
 	@echo "📦 Installing dependencies..."
